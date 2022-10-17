@@ -1,0 +1,12 @@
+.pokedex-occitech-pokemon {
+    display: flex;
+}
+
+.pokedex-occitech-pokemon-main-img {
+    width: 50%;
+}
+
+.pokedex-occitech-list,
+.pokedex-occitech-pokemon {
+    width: 100%;
+}

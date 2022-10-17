@@ -1,0 +1,146 @@
+- Environnement Docker pour Symfony : https://yoandev.co/un-environnement-de-d%C3%A9veloppement-symfony-5-avec-docker-et-docker-compose/
+
+php bin/console doctrine:database:create
+
+    1. Créer un fichier docker-compose.yml
+
+mkdir docker_symfony
+cd docker_symfony
+touch docker-compose.yml
+
+    2. Créer le conteneur MySQL et le conteneur phpMyAdmin
+
+    3.1 Créer le conteneur Apache et PHP
+
+mkdir php
+cd php
+touch Dockerfile
+
+    3.2 Créer l'image :
+
+docker-compose build
+docker-compose up
+
+    4. Créer un répertoire /php/vhosts
+
+mkdir vhosts
+cd vhosts
+touch vhosts.conf
+
+    5. Installer Symfony avec Docker
+
+docker exec www_occitech_pokedex composer create-project symfony/website-skeleton pokedex
+
+    6. Modifier le fichier .env de la manière suivante : 
+
+DATABASE_URL=mysql://root:@db_occitech_pokedex:3306/db_name?serverVersion=5.7
+
+    7. Créer la base de données :
+
+docker exec -it www_occitech_pokedex bash
+/var/www# cd pokedex
+/var/www/pokedex# php bin/console doctrine:database:create
+
+/var/www/pokedex# php bin/console make:entity
+/var/www/pokedex# php bin/console make:migration
+/var/www/pokedex# php bin/console doctrine:migrations:migrate
+
+composer require symfony/webpack-encore-bundle
+yarn install
+yarn encore dev-server
+
+docker-compose up
+
+- Combiner Symfony et React : https://www.twilio.com/blog/application-monopage-symfony-php-react
+
+- Comment utiliser les données JSON et les mettre dans les fixtures
+
+php bin/console doctrine:fixtures:load
+
+Convertir à nouveau en JSON : https://stackoverflow.com/questions/28141192/return-a-json-array-from-a-controller-in-symfony
+
+Afficher les données : https://ourcodeworld.com/articles/read/1120/how-to-pretty-print-a-jsonresponse-in-symfony-4
+
+Affichage numérique des images, problèmes path : https://stackoverflow.com/questions/62192049/how-do-i-dynamically-import-images-in-react
+
+Système de filtres : https://www.youtube.com/watch?v=iU8td4qubHU
+
+
+
+- Faire des tests unitaires : 
+
+vendor/bin/phpunit : https://www.youtube.com/watch?v=UW9UoMcHLbc
+https://symfony.com/doc/current/testing.html#unit-tests
+Tester avec la BDD : https://www.youtube.com/watch?v=p_ONHGLv-xs
+
+
+Créer un fichier test : php bin/console make:test
+
+Créer une BDD de test : php bin/console --env=test doctrine:database:create
+Recopier la BDD originale : php bin/console --env=test doctrine:schema:create
+
+php bin/console --env=test doctrine:fixtures:load
+
+php bin/phpunit
+
+- Environnement Docker pour React : https://www.pluralsight.com/guides/using-react.js-with-docker
+
+<Link to={`/pokemon/${pokemon.name}`}>+</Link>
+
+
+Bonjour à tous, 
+
+Voici le résultat de mon projet pour le test. Quand j'ai eu des difficultés, et j'ai galéré, vous avez au la gentillesse d'accorder une attention à mes appels à l'aide et à mes questions, je vous remercie tous pour cela. Bien que le projet a l'air en apparence simple à mettre en place, j'ai eu pas mal de difficultés. Cela m'a même empêché de dormir et j'ai dû faire de sessions nocturnes prolongées, non pas parce que j'étais spécialement en galère, mais parce que j'ai trouvé le projet intéressant et j'étais dans mon élan et je ne voulais pas l'interrompre. 
+
+J'ai dû lire beaucoup d'articles et de documentations pour parvenir à ce résultat et ça m'a pris beaucoup de temps. 
+
+Concernant Docker, j'ai créer un fichier docker-compose.yml et j'ai mis le code suivant dedans : 
+
+=============
+
+version: '3.8'
+services:
+  db:
+    image: mysql
+    container_name: db_occitech_pokedex
+    restart: always
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    networks:
+      - dev
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin_occitech_pokedex
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: db
+    networks:
+      - dev
+  www:
+    build: php
+    container_name: www_occitech_pokedex
+    ports:
+      - "8741:80"
+    volumes:
+      - ./php/vhosts:/etc/apache2/sites-enabled
+      - ./:/var/www
+    restart: always
+    networks:
+      - dev
+
+networks:
+  dev:
+
+
+volumes:
+  db-data:
+  
+=============
+
+Je n'ai pas créé d'image 
